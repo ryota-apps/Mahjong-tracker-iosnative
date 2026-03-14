@@ -12,7 +12,7 @@ struct ContentView: View {
     var body: some View {
         TabView {
             Tab("記録する", systemImage: "pencil") {
-                Text("Coming Soon")
+                RecordView()
             }
             Tab("戦績一覧", systemImage: "list.bullet") {
                 Text("Coming Soon")
