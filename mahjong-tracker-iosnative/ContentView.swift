@@ -24,7 +24,7 @@ struct ContentView: View {
                 ShopsView()
             }
             Tab("データ", systemImage: "square.and.arrow.up") {
-                Text("Coming Soon")
+                DataView()
             }
         }
     }
