@@ -12,7 +12,8 @@ import SwiftData
 struct mahjong_tracker_iosnativeApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Session.self,
+            Shop.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
