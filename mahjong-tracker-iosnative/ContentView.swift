@@ -18,7 +18,7 @@ struct ContentView: View {
                 HistoryView()
             }
             Tab("分析", systemImage: "chart.bar") {
-                Text("Coming Soon")
+                AnalysisView()
             }
             Tab("店舗設定", systemImage: "building.2") {
                 Text("Coming Soon")
