@@ -6,8 +6,27 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		A3BBF5B42F65A98500189C62 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A3AAF5A92F65A98500189C61 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A3AAF5B02F65A98500189C61;
+			remoteInfo = "mahjong-tracker-iosnative";
+		};
+		A3BBF5B42F65A98500189C63 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A3AAF5A92F65A98500189C61 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A3AAF5B02F65A98500189C61;
+			remoteInfo = "mahjong-tracker-iosnative";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		A3AAF5B12F65A98500189C61 /* mahjong-tracker-iosnative.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mahjong-tracker-iosnative.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3BBF5112F65A98500189C62 /* mahjong-tracker-iosnativeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mahjong-tracker-iosnativeTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3BBF5112F65A98500189C63 /* mahjong-tracker-iosnativeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mahjong-tracker-iosnativeUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -29,10 +48,34 @@
 			path = "mahjong-tracker-iosnative";
 			sourceTree = "<group>";
 		};
+		A3BBF5322F65A98500189C62 /* mahjong-tracker-iosnativeTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "mahjong-tracker-iosnativeTests";
+			sourceTree = "<group>";
+		};
+		A3BBF5322F65A98500189C63 /* mahjong-tracker-iosnativeUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "mahjong-tracker-iosnativeUITests";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A3AAF5AE2F65A98500189C61 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A3BBF5AD2F65A98500189C62 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A3BBF5AD2F65A98500189C63 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -46,6 +89,8 @@
 			isa = PBXGroup;
 			children = (
 				A3AAF5B32F65A98500189C61 /* mahjong-tracker-iosnative */,
+				A3BBF5322F65A98500189C62 /* mahjong-tracker-iosnativeTests */,
+				A3BBF5322F65A98500189C63 /* mahjong-tracker-iosnativeUITests */,
 				A3AAF5B22F65A98500189C61 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +99,8 @@
 			isa = PBXGroup;
 			children = (
 				A3AAF5B12F65A98500189C61 /* mahjong-tracker-iosnative.app */,
+				A3BBF5112F65A98500189C62 /* mahjong-tracker-iosnativeTests.xctest */,
+				A3BBF5112F65A98500189C63 /* mahjong-tracker-iosnativeUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,6 +130,48 @@
 			productReference = A3AAF5B12F65A98500189C61 /* mahjong-tracker-iosnative.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A3BBF5AF2F65A98500189C62 /* mahjong-tracker-iosnativeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A3BBF5B22F65A98500189C62 /* Build configuration list for PBXNativeTarget "mahjong-tracker-iosnativeTests" */;
+			buildPhases = (
+				A3BBF5AC2F65A98500189C62 /* Sources */,
+				A3BBF5AD2F65A98500189C62 /* Frameworks */,
+				A3BBF5AE2F65A98500189C62 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A3BBF5B32F65A98500189C62 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A3BBF5322F65A98500189C62 /* mahjong-tracker-iosnativeTests */,
+			);
+			name = "mahjong-tracker-iosnativeTests";
+			productName = "mahjong-tracker-iosnativeTests";
+			productReference = A3BBF5112F65A98500189C62 /* mahjong-tracker-iosnativeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A3BBF5AF2F65A98500189C63 /* mahjong-tracker-iosnativeUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A3BBF5B22F65A98500189C63 /* Build configuration list for PBXNativeTarget "mahjong-tracker-iosnativeUITests" */;
+			buildPhases = (
+				A3BBF5AC2F65A98500189C63 /* Sources */,
+				A3BBF5AD2F65A98500189C63 /* Frameworks */,
+				A3BBF5AE2F65A98500189C63 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A3BBF5B32F65A98500189C63 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A3BBF5322F65A98500189C63 /* mahjong-tracker-iosnativeUITests */,
+			);
+			name = "mahjong-tracker-iosnativeUITests";
+			productName = "mahjong-tracker-iosnativeUITests";
+			productReference = A3BBF5112F65A98500189C63 /* mahjong-tracker-iosnativeUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -95,6 +184,14 @@
 				TargetAttributes = {
 					A3AAF5B02F65A98500189C61 = {
 						CreatedOnToolsVersion = 26.3;
+					};
+					A3BBF5AF2F65A98500189C62 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = A3AAF5B02F65A98500189C61;
+					};
+					A3BBF5AF2F65A98500189C63 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = A3AAF5B02F65A98500189C61;
 					};
 				};
 			};
@@ -113,12 +210,28 @@
 			projectRoot = "";
 			targets = (
 				A3AAF5B02F65A98500189C61 /* mahjong-tracker-iosnative */,
+				A3BBF5AF2F65A98500189C62 /* mahjong-tracker-iosnativeTests */,
+				A3BBF5AF2F65A98500189C63 /* mahjong-tracker-iosnativeUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		A3AAF5AF2F65A98500189C61 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A3BBF5AE2F65A98500189C62 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A3BBF5AE2F65A98500189C63 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -135,7 +248,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A3BBF5AC2F65A98500189C62 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A3BBF5AC2F65A98500189C63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A3BBF5B32F65A98500189C62 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A3AAF5B02F65A98500189C61 /* mahjong-tracker-iosnative */;
+			targetProxy = A3BBF5B42F65A98500189C62 /* PBXContainerItemProxy */;
+		};
+		A3BBF5B32F65A98500189C63 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A3AAF5B02F65A98500189C61 /* mahjong-tracker-iosnative */;
+			targetProxy = A3BBF5B42F65A98500189C63 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A3AAF5C02F65A98500189C61 /* Debug */ = {
@@ -327,6 +467,88 @@
 			};
 			name = Release;
 		};
+		A3BBF5B02F65A98500189C62 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B7SA35WR4B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ryota.mahjongtracker.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/mahjong-tracker-iosnative.app/mahjong-tracker-iosnative";
+			};
+			name = Debug;
+		};
+		A3BBF5B02F65A98500189C63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B7SA35WR4B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ryota.mahjongtracker.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "mahjong-tracker-iosnative";
+			};
+			name = Debug;
+		};
+		A3BBF5B12F65A98500189C62 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B7SA35WR4B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ryota.mahjongtracker.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/mahjong-tracker-iosnative.app/mahjong-tracker-iosnative";
+			};
+			name = Release;
+		};
+		A3BBF5B12F65A98500189C63 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B7SA35WR4B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ryota.mahjongtracker.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "mahjong-tracker-iosnative";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -344,6 +566,24 @@
 			buildConfigurations = (
 				A3AAF5C02F65A98500189C61 /* Debug */,
 				A3AAF5C12F65A98500189C61 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A3BBF5B22F65A98500189C62 /* Build configuration list for PBXNativeTarget "mahjong-tracker-iosnativeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A3BBF5B02F65A98500189C62 /* Debug */,
+				A3BBF5B12F65A98500189C62 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A3BBF5B22F65A98500189C63 /* Build configuration list for PBXNativeTarget "mahjong-tracker-iosnativeUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A3BBF5B02F65A98500189C63 /* Debug */,
+				A3BBF5B12F65A98500189C63 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
