@@ -15,7 +15,7 @@ struct ContentView: View {
                 RecordView()
             }
             Tab("戦績一覧", systemImage: "list.bullet") {
-                Text("Coming Soon")
+                HistoryView()
             }
             Tab("分析", systemImage: "chart.bar") {
                 Text("Coming Soon")
