@@ -6,13 +6,7 @@ import Charts
 
 struct AnalysisView: View {
     @Query(sort: \Session.createdAt, order: .reverse) private var allSessions: [Session]
-
-    @State private var filterPlayers: Int? = nil
-    @State private var filterGameType: String? = nil
-    @State private var filterShop: String? = nil
-    @State private var filterRate: Int? = nil
-    @State private var withFees: Bool = true
-    @State private var dateRange: DateRangePreset = .all
+    @Environment(FilterState.self) private var filterState
 
     // MARK: Computed
 
@@ -25,11 +19,11 @@ struct AnalysisView: View {
     }
 
     private var filteredSessions: [Session] {
-        var result = applyDateFilter(Array(allSessions), preset: dateRange)
-        if let p = filterPlayers  { result = result.filter { $0.players == p } }
-        if let gt = filterGameType { result = result.filter { $0.gameType == gt } }
-        if let s = filterShop     { result = result.filter { $0.shop == s } }
-        if let r = filterRate     { result = result.filter { $0.rule == r } }
+        var result = applyDateFilter(Array(allSessions), preset: filterState.dateRange)
+        if let p = filterState.filterPlayers  { result = result.filter { $0.players == p } }
+        if let gt = filterState.filterGameType { result = result.filter { $0.gameType == gt } }
+        if let s = filterState.filterShop     { result = result.filter { $0.shop == s } }
+        if let r = filterState.filterRate     { result = result.filter { $0.rule == r } }
         return result.sorted { $0.date < $1.date }
     }
 
@@ -53,11 +47,11 @@ struct AnalysisView: View {
     private var cumulativePoints: [CumulativePoint] {
         var running = 0
         let all: [CumulativePoint] = filteredSessions.map { session in
-            running += getNet(session, withFees: withFees)
+            running += getNet(session, withFees: filterState.withFees)
             return CumulativePoint(date: session.date, cumulative: running)
         }
         // .all: show last 30 sessions; filtered period: show all sessions in range
-        return dateRange == .all ? Array(all.suffix(30)) : all
+        return filterState.dateRange == .all ? Array(all.suffix(30)) : all
     }
 
     private var monthlyBars: [MonthlyBar] {
@@ -72,18 +66,18 @@ struct AnalysisView: View {
                   let nextMonth = cal.date(byAdding: .month, value: 1, to: monthStart) else { return nil }
             let monthSessions = filteredSessions.filter { $0.date >= monthStart && $0.date < nextMonth }
             guard !monthSessions.isEmpty else { return nil }
-            let net = monthSessions.reduce(0) { $0 + getNet($1, withFees: withFees) }
+            let net = monthSessions.reduce(0) { $0 + getNet($1, withFees: filterState.withFees) }
             return MonthlyBar(label: fmt.string(from: monthStart), monthStart: monthStart, net: net)
         }
     }
 
     // MARK: Stats helpers
 
-    private var totalNet: Int { filteredSessions.reduce(0) { $0 + getNet($1, withFees: withFees) } }
+    private var totalNet: Int { filteredSessions.reduce(0) { $0 + getNet($1, withFees: filterState.withFees) } }
     private var totalChipNet: Int { filteredSessions.reduce(0) { $0 + $1.chipVal } }
     private var hasChipData: Bool { filteredSessions.contains { $0.chipVal != 0 } }
-    private var maxNet: Int { filteredSessions.map { getNet($0, withFees: withFees) }.max() ?? 0 }
-    private var minNet: Int { filteredSessions.map { getNet($0, withFees: withFees) }.min() ?? 0 }
+    private var maxNet: Int { filteredSessions.map { getNet($0, withFees: filterState.withFees) }.max() ?? 0 }
+    private var minNet: Int { filteredSessions.map { getNet($0, withFees: filterState.withFees) }.min() ?? 0 }
 
     private func totalGameCount(players: Int) -> Int {
         filteredSessions.filter { $0.players == players }.reduce(0) { $0 + $1.totalGames }
@@ -126,7 +120,7 @@ struct AnalysisView: View {
             let gameCount = sessions.reduce(0) { $0 + $1.totalGames }
             let firstCount = sessions.reduce(0) { $0 + $1.count1 }
             let firstRate = gameCount > 0 ? Double(firstCount) / Double(gameCount) : 0
-            let net = sessions.reduce(0) { $0 + getNet($1, withFees: withFees) }
+            let net = sessions.reduce(0) { $0 + getNet($1, withFees: filterState.withFees) }
             let chip = sessions.reduce(0) { $0 + $1.chipVal }
             return ShopStats(
                 name: name.isEmpty ? "店舗未設定" : name,
@@ -176,7 +170,7 @@ struct AnalysisView: View {
     private var headerTitle: some View {
         HStack {
             Text("分析")
-                .font(.system(size: 28, weight: .bold, design: .serif))
+                .font(.system(.title, design: .serif, weight: .bold))
                 .foregroundStyle(Color("AppInk"))
             Spacer()
         }
@@ -191,60 +185,61 @@ struct AnalysisView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(DateRangePreset.allCases, id: \.self) { preset in
-                    Button(action: { dateRange = preset }) {
-                        filterChipLabel(preset.rawValue, active: dateRange == preset)
+                    Button(action: { filterState.dateRange = preset }) {
+                        filterChipLabel(preset.rawValue, active: filterState.dateRange == preset)
                     }
                 }
                 chipDivider
                 Menu {
-                    Button("全人数") { filterPlayers = nil }
-                    Button("3人") { filterPlayers = 3 }
-                    Button("4人") { filterPlayers = 4 }
+                    Button("全人数") { filterState.filterPlayers = nil }
+                    Button("3人") { filterState.filterPlayers = 3 }
+                    Button("4人") { filterState.filterPlayers = 4 }
                 } label: {
-                    filterChipLabel(filterPlayers.map { "\($0)人" } ?? "人数", active: filterPlayers != nil)
+                    filterChipLabel(filterState.filterPlayers.map { "\($0)人" } ?? "人数",
+                                    active: filterState.filterPlayers != nil)
                 }
                 Menu {
-                    Button("全種別") { filterGameType = nil }
-                    Button("フリー") { filterGameType = "free" }
-                    Button("セット") { filterGameType = "set" }
+                    Button("全種別") { filterState.filterGameType = nil }
+                    Button("フリー") { filterState.filterGameType = "free" }
+                    Button("セット") { filterState.filterGameType = "set" }
                 } label: {
                     filterChipLabel(
-                        filterGameType == "free" ? "フリー" : filterGameType == "set" ? "セット" : "種別",
-                        active: filterGameType != nil
+                        filterState.filterGameType == "free" ? "フリー" : filterState.filterGameType == "set" ? "セット" : "種別",
+                        active: filterState.filterGameType != nil
                     )
                 }
                 if !uniqueShops.isEmpty {
                     Menu {
-                        Button("全店舗") { filterShop = nil }
+                        Button("全店舗") { filterState.filterShop = nil }
                         ForEach(uniqueShops, id: \.self) { name in
-                            Button(name) { filterShop = name }
+                            Button(name) { filterState.filterShop = name }
                         }
                     } label: {
-                        filterChipLabel(filterShop ?? "店舗", active: filterShop != nil)
+                        filterChipLabel(filterState.filterShop ?? "店舗", active: filterState.filterShop != nil)
                     }
                 }
                 if !uniqueRates.isEmpty {
                     Menu {
-                        Button("全レート") { filterRate = nil }
+                        Button("全レート") { filterState.filterRate = nil }
                         ForEach(uniqueRates, id: \.self) { r in
-                            Button(r == 0 ? "未設定" : "\(r)点") { filterRate = r }
+                            Button(r == 0 ? "未設定" : "\(r)点") { filterState.filterRate = r }
                         }
                     } label: {
                         filterChipLabel(
-                            filterRate.map { $0 == 0 ? "未設定" : "\($0)点" } ?? "レート",
-                            active: filterRate != nil
+                            filterState.filterRate.map { $0 == 0 ? "未設定" : "\($0)点" } ?? "レート",
+                            active: filterState.filterRate != nil
                         )
                     }
                 }
                 chipDivider
-                Button(action: { withFees.toggle() }) {
+                Button(action: { filterState.withFees.toggle() }) {
                     HStack(spacing: 4) {
-                        Image(systemName: withFees ? "checkmark.square.fill" : "square").font(.caption)
-                        Text("ゲーム代込み").font(.caption.weight(.medium))
+                        Image(systemName: filterState.withFees ? "checkmark.square.fill" : "square").font(.caption)
+                        Text(filterState.withFees ? "差し引く" : "差し引かない").font(.caption.weight(.medium))
                     }
                     .padding(.horizontal, 12).padding(.vertical, 7)
-                    .background(withFees ? Color("AppInk") : Color("AppCream"))
-                    .foregroundStyle(withFees ? Color("AppPaper") : Color("AppInk"))
+                    .background(filterState.withFees ? Color("AppInk") : Color("AppCream"))
+                    .foregroundStyle(filterState.withFees ? Color("AppPaper") : Color("AppInk"))
                     .clipShape(Capsule())
                     .overlay(Capsule().stroke(Color("AppInk").opacity(0.2), lineWidth: 1))
                 }
@@ -273,7 +268,7 @@ struct AnalysisView: View {
     private var emptyState: some View {
         VStack(spacing: 16) {
             Spacer()
-            Text("🀄").font(.system(size: 56))
+            Text("🀄").font(.system(size: 52))
             Text("データなし")
                 .font(.headline).foregroundStyle(Color("AppInk").opacity(0.5))
             Text("フィルターを変更するか、新しいセッションを記録してください")
@@ -474,7 +469,7 @@ struct AnalysisView: View {
             }
             Spacer()
             Text(total > 0 ? String(format: "%.2f", avg) : "—")
-                .font(.system(size: 32, weight: .bold, design: .rounded))
+                .font(.system(.title, design: .rounded, weight: .bold))
                 .foregroundStyle(Color("AppInk"))
             Text("着")
                 .font(.caption)
@@ -587,7 +582,7 @@ struct AnalysisView: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(stats.name)
-                    .font(.system(size: 15, weight: .bold, design: .serif))
+                    .font(.system(.subheadline, design: .serif, weight: .bold))
                     .foregroundStyle(Color("AppInk"))
                 Spacer()
                 Text(signedYen(stats.net))
@@ -701,4 +696,5 @@ struct AnalysisView: View {
 #Preview {
     AnalysisView()
         .modelContainer(for: [Session.self, Shop.self], inMemory: true)
+        .environment(FilterState())
 }

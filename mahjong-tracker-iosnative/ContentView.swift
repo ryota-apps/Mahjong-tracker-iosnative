@@ -9,6 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    @State private var filterState = FilterState()
+
     var body: some View {
         TabView {
             Tab("記録する", systemImage: "pencil") {
@@ -27,6 +29,7 @@ struct ContentView: View {
                 DataView()
             }
         }
+        .environment(filterState)
     }
 }
 

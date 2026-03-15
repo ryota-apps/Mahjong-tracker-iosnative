@@ -1,5 +1,14 @@
 import Foundation
 
+// MARK: - HistorySortOrder
+
+enum HistorySortOrder: String, CaseIterable {
+    case newFirst = "新しい順"
+    case oldFirst = "古い順"
+    case balanceHigh = "収支高い順"
+    case balanceLow = "収支低い順"
+}
+
 // MARK: - DateRangePreset
 
 enum DateRangePreset: String, CaseIterable {

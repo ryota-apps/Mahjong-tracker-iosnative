@@ -5,9 +5,12 @@ import UIKit
 // MARK: - RecordView (root)
 
 struct RecordView: View {
+    @Query(sort: \Session.date, order: .reverse) private var allSessions: [Session]
+
     @State private var isSessionActive = false
     @State private var sessionConfig: SessionConfig?
     @State private var showSavedToast = false
+    @State private var toastMessage = "保存しました"
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -21,9 +24,18 @@ struct RecordView: View {
                     onSaved: {
                         isSessionActive = false
                         sessionConfig = nil
-                        showSavedToast = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            showSavedToast = false
+                        // Delay one run-loop tick so @Query picks up the new session
+                        DispatchQueue.main.async {
+                            let cal = Calendar.current
+                            let todayNet = allSessions
+                                .filter { cal.isDateInToday($0.date) }
+                                .reduce(0) { $0 + $1.net }
+                            let sign = todayNet >= 0 ? "+" : ""
+                            toastMessage = "保存しました　今日: \(sign)\(todayNet)円"
+                            showSavedToast = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                                showSavedToast = false
+                            }
                         }
                     }
                 )
@@ -39,7 +51,7 @@ struct RecordView: View {
             }
 
             if showSavedToast {
-                ToastView(message: "保存しました")
+                ToastView(message: toastMessage)
                     .padding(.bottom, 32)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .animation(.easeInOut, value: showSavedToast)
@@ -291,7 +303,7 @@ struct SetupView: View {
     private var headerTitle: some View {
         HStack {
             Text("記録する")
-                .font(.system(size: 28, weight: .bold, design: .serif))
+                .font(.system(.title, design: .serif, weight: .bold))
                 .foregroundStyle(Color("AppInk"))
             Spacer()
         }
@@ -481,7 +493,7 @@ struct SessionInputView: View {
         HStack(alignment: .center, spacing: 0) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(config.shopName.isEmpty ? "店舗未設定" : config.shopName)
-                    .font(.system(size: 17, weight: .bold, design: .serif))
+                    .font(.system(.body, design: .serif, weight: .bold))
                     .foregroundStyle(Color("AppInk"))
                 HStack(spacing: 6) {
                     Text(config.date, style: .date)
@@ -559,7 +571,7 @@ struct SessionInputView: View {
             }
 
             Text("\(counts[place] ?? 0)")
-                .font(.system(size: 44, weight: .bold, design: .rounded))
+                .font(.system(.largeTitle, design: .rounded, weight: .bold))
                 .foregroundStyle(Color("AppInk"))
                 .frame(height: 52)
 
@@ -702,7 +714,7 @@ struct SessionInputView: View {
     private var setBalanceRows: some View {
         numberInputRow(
             icon: "chart.bar",
-            label: "素点収支",
+            label: "点棒収支",
             placeholder: "±0",
             text: $balance,
             field: .balance

@@ -1,31 +1,16 @@
 import SwiftUI
 import SwiftData
 
-// MARK: - HistorySortOrder
-
-enum HistorySortOrder: String, CaseIterable {
-    case newFirst = "新しい順"
-    case oldFirst = "古い順"
-    case balanceHigh = "収支高い順"
-    case balanceLow = "収支低い順"
-}
-
 // MARK: - HistoryView
 
 struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(FilterState.self) private var filterState
     @Query(sort: \Session.createdAt, order: .reverse) private var allSessions: [Session]
-
-    @State private var filterPlayers: Int? = nil
-    @State private var filterGameType: String? = nil
-    @State private var filterShop: String? = nil
-    @State private var filterRate: Int? = nil
-    @State private var withFees: Bool = true
-    @State private var dateRange: DateRangePreset = .all
-    @State private var sortOrder: HistorySortOrder = .newFirst
 
     @State private var editingSession: Session? = nil
     @State private var deletingSession: Session? = nil
+    @State private var showDuplicateToast = false
 
     // MARK: Computed
 
@@ -38,24 +23,28 @@ struct HistoryView: View {
     }
 
     private var filteredSessions: [Session] {
-        var result = applyDateFilter(Array(allSessions), preset: dateRange)
-        if let p = filterPlayers { result = result.filter { $0.players == p } }
-        if let gt = filterGameType { result = result.filter { $0.gameType == gt } }
-        if let s = filterShop { result = result.filter { $0.shop == s } }
-        if let r = filterRate { result = result.filter { $0.rule == r } }
+        var result = applyDateFilter(Array(allSessions), preset: filterState.dateRange)
+        if let p = filterState.filterPlayers { result = result.filter { $0.players == p } }
+        if let gt = filterState.filterGameType { result = result.filter { $0.gameType == gt } }
+        if let s = filterState.filterShop { result = result.filter { $0.shop == s } }
+        if let r = filterState.filterRate { result = result.filter { $0.rule == r } }
 
-        switch sortOrder {
-        case .newFirst:   result.sort { $0.createdAt > $1.createdAt }
-        case .oldFirst:   result.sort { $0.createdAt < $1.createdAt }
-        case .balanceHigh: result.sort { getNet($0, withFees: withFees) > getNet($1, withFees: withFees) }
-        case .balanceLow:  result.sort { getNet($0, withFees: withFees) < getNet($1, withFees: withFees) }
+        switch filterState.sortOrder {
+        case .newFirst:    result.sort { $0.createdAt > $1.createdAt }
+        case .oldFirst:    result.sort { $0.createdAt < $1.createdAt }
+        case .balanceHigh: result.sort { getNet($0, withFees: filterState.withFees) > getNet($1, withFees: filterState.withFees) }
+        case .balanceLow:  result.sort { getNet($0, withFees: filterState.withFees) < getNet($1, withFees: filterState.withFees) }
         }
         return result
     }
 
+    private var filterKey: String {
+        "\(filterState.dateRange.rawValue)-\(filterState.filterPlayers ?? -1)-\(filterState.filterGameType ?? "")-\(filterState.filterShop ?? "")-\(filterState.filterRate ?? -1)-\(filterState.sortOrder.rawValue)"
+    }
+
     var body: some View {
         NavigationStack {
-            ZStack {
+            ZStack(alignment: .bottom) {
                 Color("AppPaper").ignoresSafeArea()
 
                 VStack(spacing: 0) {
@@ -68,6 +57,13 @@ struct HistoryView: View {
                     } else {
                         sessionList
                     }
+                }
+
+                if showDuplicateToast {
+                    ToastView(message: "複製しました")
+                        .padding(.bottom, 32)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .animation(.easeInOut, value: showDuplicateToast)
                 }
             }
             .navigationBarHidden(true)
@@ -94,7 +90,7 @@ struct HistoryView: View {
     private var headerTitle: some View {
         HStack {
             Text("戦績一覧")
-                .font(.system(size: 28, weight: .bold, design: .serif))
+                .font(.system(.title, design: .serif, weight: .bold))
                 .foregroundStyle(Color("AppInk"))
             Spacer()
         }
@@ -109,67 +105,70 @@ struct HistoryView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(DateRangePreset.allCases, id: \.self) { preset in
-                    filterChip(preset.rawValue, active: dateRange == preset) {
-                        dateRange = preset
+                    filterChip(preset.rawValue, active: filterState.dateRange == preset) {
+                        filterState.dateRange = preset
                     }
                 }
 
                 chipDivider
 
                 Menu {
-                    Button("全人数") { filterPlayers = nil }
-                    Button("3人") { filterPlayers = 3 }
-                    Button("4人") { filterPlayers = 4 }
+                    Button("全人数") { filterState.filterPlayers = nil }
+                    Button("3人") { filterState.filterPlayers = 3 }
+                    Button("4人") { filterState.filterPlayers = 4 }
                 } label: {
-                    filterChipLabel(filterPlayers.map { "\($0)人" } ?? "人数", active: filterPlayers != nil)
+                    filterChipLabel(filterState.filterPlayers.map { "\($0)人" } ?? "人数",
+                                    active: filterState.filterPlayers != nil)
                 }
 
                 Menu {
-                    Button("全種別") { filterGameType = nil }
-                    Button("フリー") { filterGameType = "free" }
-                    Button("セット") { filterGameType = "set" }
+                    Button("全種別") { filterState.filterGameType = nil }
+                    Button("フリー") { filterState.filterGameType = "free" }
+                    Button("セット") { filterState.filterGameType = "set" }
                 } label: {
-                    filterChipLabel(gameTypeLabel(filterGameType), active: filterGameType != nil)
+                    filterChipLabel(gameTypeLabel(filterState.filterGameType),
+                                    active: filterState.filterGameType != nil)
                 }
 
                 if !uniqueShops.isEmpty {
                     Menu {
-                        Button("全店舗") { filterShop = nil }
+                        Button("全店舗") { filterState.filterShop = nil }
                         ForEach(uniqueShops, id: \.self) { name in
-                            Button(name) { filterShop = name }
+                            Button(name) { filterState.filterShop = name }
                         }
                     } label: {
-                        filterChipLabel(filterShop ?? "店舗", active: filterShop != nil)
+                        filterChipLabel(filterState.filterShop ?? "店舗",
+                                        active: filterState.filterShop != nil)
                     }
                 }
 
                 if !uniqueRates.isEmpty {
                     Menu {
-                        Button("全レート") { filterRate = nil }
+                        Button("全レート") { filterState.filterRate = nil }
                         ForEach(uniqueRates, id: \.self) { r in
-                            Button(r == 0 ? "未設定" : "\(r)点") { filterRate = r }
+                            Button(r == 0 ? "未設定" : "\(r)点") { filterState.filterRate = r }
                         }
                     } label: {
                         filterChipLabel(
-                            filterRate.map { $0 == 0 ? "未設定" : "\($0)点" } ?? "レート",
-                            active: filterRate != nil
+                            filterState.filterRate.map { $0 == 0 ? "未設定" : "\($0)点" } ?? "レート",
+                            active: filterState.filterRate != nil
                         )
                     }
                 }
 
                 chipDivider
 
-                Button(action: { withFees.toggle() }) {
+                Button(action: { filterState.withFees.toggle() }) {
                     HStack(spacing: 4) {
-                        Image(systemName: withFees ? "checkmark.square.fill" : "square")
+                        Image(systemName: filterState.withFees ? "checkmark.square.fill" : "square")
                             .font(.caption)
-                        Text("ゲーム代込み")
+                        Text(filterState.withFees ? "差し引く" : "差し引かない")
                             .font(.caption.weight(.medium))
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 7)
-                    .background(withFees ? Color("AppInk") : Color("AppCream"))
-                    .foregroundStyle(withFees ? Color("AppPaper") : Color("AppInk"))
+                    .background(filterState.withFees ? Color("AppInk") : Color("AppCream"))
+                    .foregroundStyle(filterState.withFees ? Color("AppPaper") : Color("AppInk"))
                     .clipShape(Capsule())
                     .overlay(Capsule().stroke(Color("AppInk").opacity(0.2), lineWidth: 1))
                 }
@@ -178,12 +177,12 @@ struct HistoryView: View {
 
                 Menu {
                     ForEach(HistorySortOrder.allCases, id: \.self) { order in
-                        Button(order.rawValue) { sortOrder = order }
+                        Button(order.rawValue) { filterState.sortOrder = order }
                     }
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "arrow.up.arrow.down").font(.caption)
-                        Text(sortOrder.rawValue).font(.caption.weight(.medium))
+                        Text(filterState.sortOrder.rawValue).font(.caption.weight(.medium))
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 7)
@@ -224,7 +223,7 @@ struct HistoryView: View {
 
     private var summaryBar: some View {
         let sessions = filteredSessions
-        let totalNet = sessions.reduce(0) { $0 + getNet($1, withFees: withFees) }
+        let totalNet = sessions.reduce(0) { $0 + getNet($1, withFees: filterState.withFees) }
         let totalGames = sessions.reduce(0) { $0 + $1.totalGames }
         let avgPlace: Double = {
             guard totalGames > 0 else { return 0 }
@@ -280,28 +279,43 @@ struct HistoryView: View {
     // MARK: Session list
 
     private var sessionList: some View {
-        List {
-            ForEach(filteredSessions) { session in
-                SessionCard(session: session, withFees: withFees,
-                            onEdit: { editingSession = session },
-                            onDelete: { deletingSession = session })
-                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        Button(role: .destructive) { deletingSession = session } label: {
-                            Label("削除", systemImage: "trash")
+        ScrollViewReader { proxy in
+            List {
+                ForEach(filteredSessions) { session in
+                    SessionCard(session: session, withFees: filterState.withFees,
+                                onEdit: { editingSession = session },
+                                onDelete: { deletingSession = session })
+                        .id(session.id)
+                        .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                            Button { duplicate(session) } label: {
+                                Label("複製", systemImage: "doc.on.doc")
+                            }
+                            .tint(Color("AppGold"))
                         }
-                        Button { editingSession = session } label: {
-                            Label("編集", systemImage: "pencil")
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) { deletingSession = session } label: {
+                                Label("削除", systemImage: "trash")
+                            }
+                            Button { editingSession = session } label: {
+                                Label("編集", systemImage: "pencil")
+                            }
+                            .tint(Color("AppTeal"))
                         }
-                        .tint(Color("AppTeal"))
-                    }
+                }
+            }
+            .listStyle(.plain)
+            .background(Color("AppPaper"))
+            .scrollContentBackground(.hidden)
+            .onChange(of: filterKey) { _, _ in
+                guard let firstID = filteredSessions.first?.id else { return }
+                DispatchQueue.main.async {
+                    withAnimation { proxy.scrollTo(firstID, anchor: .top) }
+                }
             }
         }
-        .listStyle(.plain)
-        .background(Color("AppPaper"))
-        .scrollContentBackground(.hidden)
     }
 
     // MARK: Empty state
@@ -316,6 +330,37 @@ struct HistoryView: View {
                 .font(.caption).foregroundStyle(Color("AppInk").opacity(0.35))
                 .multilineTextAlignment(.center).padding(.horizontal, 40)
             Spacer()
+        }
+    }
+
+    // MARK: Actions
+
+    private func duplicate(_ session: Session) {
+        let copy = Session(
+            shop: session.shop,
+            date: Date(),
+            players: session.players,
+            format: session.format,
+            rule: session.rule,
+            gameType: session.gameType,
+            count1: session.count1,
+            count2: session.count2,
+            count3: session.count3,
+            count4: session.count4,
+            balance: session.balance,
+            chips: session.chips,
+            chipUnit: session.chipUnit,
+            chipVal: session.chipVal,
+            venueFee: session.venueFee,
+            net: session.net,
+            gameFee: session.gameFee,
+            topPrize: session.topPrize,
+            note: session.note
+        )
+        modelContext.insert(copy)
+        showDuplicateToast = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            showDuplicateToast = false
         }
     }
 
@@ -355,7 +400,7 @@ struct SessionCard: View {
         HStack(alignment: .top, spacing: 8) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(session.shop.isEmpty ? "店舗未設定" : session.shop)
-                    .font(.system(size: 16, weight: .bold, design: .serif))
+                    .font(.system(.callout, design: .serif, weight: .bold))
                     .foregroundStyle(Color("AppInk"))
                 HStack(spacing: 6) {
                     Text(session.date, format: .dateTime.month().day())
@@ -513,7 +558,7 @@ struct EditSessionSheet: View {
                         }
                         editCard("収支") {
                             rowTextField(
-                                session.gameType == "free" ? "現金収支" : "素点収支",
+                                session.gameType == "free" ? "現金収支" : "点棒収支",
                                 placeholder: "±0", text: $balance, field: .balance,
                                 keyboard: .numbersAndPunctuation
                             )
@@ -615,4 +660,5 @@ struct EditSessionSheet: View {
 #Preview {
     HistoryView()
         .modelContainer(for: [Session.self, Shop.self], inMemory: true)
+        .environment(FilterState())
 }
