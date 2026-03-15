@@ -56,7 +56,8 @@ struct AnalysisView: View {
             running += getNet(session, withFees: withFees)
             return CumulativePoint(date: session.date, cumulative: running)
         }
-        return Array(all.suffix(6))
+        // .all: show last 30 sessions; filtered period: show all sessions in range
+        return dateRange == .all ? Array(all.suffix(30)) : all
     }
 
     private var monthlyBars: [MonthlyBar] {
@@ -70,6 +71,7 @@ struct AnalysisView: View {
             guard let monthStart = cal.date(byAdding: .month, value: offset, to: thisMonthStart),
                   let nextMonth = cal.date(byAdding: .month, value: 1, to: monthStart) else { return nil }
             let monthSessions = filteredSessions.filter { $0.date >= monthStart && $0.date < nextMonth }
+            guard !monthSessions.isEmpty else { return nil }
             let net = monthSessions.reduce(0) { $0 + getNet($1, withFees: withFees) }
             return MonthlyBar(label: fmt.string(from: monthStart), monthStart: monthStart, net: net)
         }
@@ -393,41 +395,45 @@ struct AnalysisView: View {
 
     private var monthlyBarSection: some View {
         analysisCard("月別収支（直近6ヶ月）") {
-            Chart {
-                ForEach(monthlyBars) { bar in
-                    BarMark(
-                        x: .value("月", bar.label),
-                        y: .value("収支", bar.net)
-                    )
-                    .foregroundStyle(bar.net >= 0 ? Color("AppTealLight") : Color("AppRed"))
-                    .cornerRadius(4)
+            if monthlyBars.isEmpty {
+                noDataLabel
+            } else {
+                Chart {
+                    ForEach(monthlyBars) { bar in
+                        BarMark(
+                            x: .value("月", bar.label),
+                            y: .value("収支", bar.net)
+                        )
+                        .foregroundStyle(bar.net >= 0 ? Color("AppTealLight") : Color("AppRed"))
+                        .cornerRadius(4)
+                    }
+                    RuleMark(y: .value("Zero", 0))
+                        .lineStyle(StrokeStyle(dash: [5, 4]))
+                        .foregroundStyle(Color("AppInk").opacity(0.2))
                 }
-                RuleMark(y: .value("Zero", 0))
-                    .lineStyle(StrokeStyle(dash: [5, 4]))
-                    .foregroundStyle(Color("AppInk").opacity(0.2))
-            }
-            .chartXAxis {
-                AxisMarks { value in
-                    AxisValueLabel {
-                        if let label = value.as(String.self) {
-                            Text(label).font(.caption2).foregroundStyle(Color("AppInk").opacity(0.5))
+                .chartXAxis {
+                    AxisMarks { value in
+                        AxisValueLabel {
+                            if let label = value.as(String.self) {
+                                Text(label).font(.caption2).foregroundStyle(Color("AppInk").opacity(0.5))
+                            }
                         }
                     }
                 }
-            }
-            .chartYAxis {
-                AxisMarks(values: .automatic(desiredCount: 4)) { value in
-                    AxisGridLine()
-                    AxisValueLabel {
-                        if let v = value.as(Double.self) {
-                            Text(formatK(v))
-                                .font(.caption2)
-                                .foregroundStyle(Color("AppInk").opacity(0.4))
+                .chartYAxis {
+                    AxisMarks(values: .automatic(desiredCount: 4)) { value in
+                        AxisGridLine()
+                        AxisValueLabel {
+                            if let v = value.as(Double.self) {
+                                Text(formatK(v))
+                                    .font(.caption2)
+                                    .foregroundStyle(Color("AppInk").opacity(0.4))
+                            }
                         }
                     }
                 }
+                .frame(height: 160)
             }
-            .frame(height: 160)
         }
     }
 

@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 // MARK: - RecordView (root)
 
@@ -62,6 +63,43 @@ struct SessionConfig {
     var topPrize: Int
 }
 
+// MARK: - LastConfig (UserDefaults persistence)
+
+private struct LastConfig: Codable {
+    var gameType: String
+    var shopName: String
+    var players: Int
+    var format: String
+    var rule: Int
+    var chipUnit: Int
+    var gameFee: Int
+    var topPrize: Int
+}
+
+private let lastConfigKey = "lastSessionConfig"
+
+private func loadLastConfig() -> LastConfig? {
+    guard let data = UserDefaults.standard.data(forKey: lastConfigKey),
+          let config = try? JSONDecoder().decode(LastConfig.self, from: data) else { return nil }
+    return config
+}
+
+private func saveLastConfig(_ config: SessionConfig) {
+    let last = LastConfig(
+        gameType: config.gameType,
+        shopName: config.shopName,
+        players: config.players,
+        format: config.format,
+        rule: config.rule,
+        chipUnit: config.chipUnit,
+        gameFee: config.gameFee,
+        topPrize: config.topPrize
+    )
+    if let data = try? JSONEncoder().encode(last) {
+        UserDefaults.standard.set(data, forKey: lastConfigKey)
+    }
+}
+
 // MARK: - SetupView
 
 struct SetupView: View {
@@ -74,11 +112,11 @@ struct SetupView: View {
     @State private var selectedFormat: String = "東南戦"
     @State private var selectedRule: Int = 0
     @State private var selectedShopPreset: Shop?
+    @State private var lastConfig: LastConfig? = nil
 
     let onStart: (SessionConfig) -> Void
 
     private let formatOptions = ["東南戦", "東風戦", "その他"]
-    private let ruleOptions = Array(0...50)
 
     var body: some View {
         NavigationStack {
@@ -219,13 +257,33 @@ struct SetupView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 32)
+
+                        // 前回と同じ設定で開始
+                        if lastConfig != nil {
+                            Button(action: applyLastConfigAndStart) {
+                                Label("前回と同じ設定で開始", systemImage: "clock.arrow.circlepath")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(Color("AppTeal"))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .background(Color("AppTeal").opacity(0.1))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color("AppTeal").opacity(0.3), lineWidth: 1)
+                                    )
+                            }
+                            .padding(.horizontal, 16)
+                        }
+
+                        Spacer().frame(height: 16)
                     }
                     .padding(.top, 8)
                 }
             }
             .navigationBarHidden(true)
         }
+        .onAppear { lastConfig = loadLastConfig() }
     }
 
     // MARK: Subviews
@@ -303,6 +361,24 @@ struct SetupView: View {
             gameFee: selectedShopPreset?.gameFee ?? 0,
             topPrize: selectedShopPreset?.topPrize ?? 0
         )
+        saveLastConfig(config)
+        lastConfig = loadLastConfig()
+        onStart(config)
+    }
+
+    private func applyLastConfigAndStart() {
+        guard let last = lastConfig else { return }
+        let config = SessionConfig(
+            date: selectedDate,
+            gameType: last.gameType,
+            shopName: last.shopName,
+            players: last.players,
+            format: last.format,
+            rule: last.rule,
+            chipUnit: last.chipUnit,
+            gameFee: last.gameFee,
+            topPrize: last.topPrize
+        )
         onStart(config)
     }
 }
@@ -324,6 +400,7 @@ struct SessionInputView: View {
     @State private var venueFee: String = ""
     @State private var note: String = ""
     @State private var showDiscardAlert = false
+    @State private var longPressTimer: Timer?
 
     enum Field: Hashable {
         case balance, chips, chipUnit, venueFee, note
@@ -487,23 +564,20 @@ struct SessionInputView: View {
                 .frame(height: 52)
 
             HStack(spacing: 16) {
-                Button(action: { decrement(place) }) {
-                    Image(systemName: "minus")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 36, height: 36)
-                        .background(Color("AppRed"))
-                        .clipShape(Circle())
-                }
-
-                Button(action: { increment(place) }) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(Color("AppPaper"))
-                        .frame(width: 36, height: 36)
-                        .background(Color("AppInk"))
-                        .clipShape(Circle())
-                }
+                counterButton(
+                    systemImage: "minus",
+                    bgColor: Color("AppRed"),
+                    fgColor: .white,
+                    place: place,
+                    isIncrement: false
+                )
+                counterButton(
+                    systemImage: "plus",
+                    bgColor: Color("AppInk"),
+                    fgColor: Color("AppPaper"),
+                    place: place,
+                    isIncrement: true
+                )
             }
         }
         .padding(.vertical, 16)
@@ -515,6 +589,35 @@ struct SessionInputView: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color("AppInk").opacity(0.08), lineWidth: 1)
         )
+    }
+
+    private func counterButton(
+        systemImage: String,
+        bgColor: Color,
+        fgColor: Color,
+        place: Int,
+        isIncrement: Bool
+    ) -> some View {
+        Image(systemName: systemImage)
+            .font(.system(size: 14, weight: .bold))
+            .foregroundStyle(fgColor)
+            .frame(width: 36, height: 36)
+            .background(bgColor)
+            .clipShape(Circle())
+            .onTapGesture {
+                if isIncrement {
+                    increment(place)
+                } else {
+                    decrement(place)
+                }
+            }
+            .onLongPressGesture(minimumDuration: 0.4, pressing: { isPressing in
+                if isPressing {
+                    startLongPress(place: place, isIncrement: isIncrement)
+                } else {
+                    stopLongPress()
+                }
+            }, perform: {})
     }
 
     // MARK: Balance section
@@ -712,16 +815,39 @@ struct SessionInputView: View {
         .padding(.horizontal, 16)
     }
 
-    // MARK: Actions
+    // MARK: Counter actions
 
     private func increment(_ place: Int) {
         counts[place, default: 0] += 1
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 
     private func decrement(_ place: Int) {
         let current = counts[place, default: 0]
-        if current > 0 { counts[place] = current - 1 }
+        guard current > 0 else { return }
+        counts[place] = current - 1
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
+
+    private func startLongPress(place: Int, isIncrement: Bool) {
+        stopLongPress()
+        longPressTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            DispatchQueue.main.async {
+                if isIncrement {
+                    self.increment(place)
+                } else {
+                    self.decrement(place)
+                }
+            }
+        }
+    }
+
+    private func stopLongPress() {
+        longPressTimer?.invalidate()
+        longPressTimer = nil
+    }
+
+    // MARK: Helpers
 
     private func formatNet(_ value: Int) -> String {
         let sign = value >= 0 ? "+" : ""
@@ -758,6 +884,7 @@ struct SessionInputView: View {
         )
 
         modelContext.insert(session)
+        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
         onSaved()
     }
 }
