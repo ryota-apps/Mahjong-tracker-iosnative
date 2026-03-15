@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import CoreData
 import UniformTypeIdentifiers
 
 // MARK: - DataView
@@ -19,6 +20,10 @@ struct DataView: View {
     // Delete state
     @State private var showDeleteAlert = false
 
+    // iCloud
+    @AppStorage("iCloudSyncEnabled") private var iCloudSyncEnabled = true
+    @State private var lastSyncDate: Date? = nil
+
     // Toast
     @State private var toastMessage: String = ""
     @State private var showToast = false
@@ -31,6 +36,7 @@ struct DataView: View {
                 ScrollView {
                     VStack(spacing: 20) {
                         headerTitle
+                        iCloudSection
                         exportSection
                         importSection
                         dataManagementSection
@@ -47,6 +53,13 @@ struct DataView: View {
             }
             .animation(.easeInOut(duration: 0.3), value: showToast)
             .navigationBarHidden(true)
+            .task {
+                for await _ in NotificationCenter.default.notifications(
+                    named: NSPersistentCloudKitContainer.eventChangedNotification
+                ) {
+                    lastSyncDate = Date()
+                }
+            }
         }
         .fileImporter(
             isPresented: $showFileImporter,
@@ -81,6 +94,55 @@ struct DataView: View {
         .padding(.horizontal, 20)
         .padding(.top, 12)
         .padding(.bottom, 8)
+    }
+
+    // MARK: Section 0: iCloud Sync
+
+    private var iCloudSection: some View {
+        dataCard("iCloud同期") {
+            VStack(alignment: .leading, spacing: 14) {
+                Toggle(isOn: $iCloudSyncEnabled) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "icloud")
+                            .foregroundStyle(Color("AppTeal"))
+                        Text("iCloud同期")
+                            .font(.subheadline)
+                            .foregroundStyle(Color("AppInk"))
+                    }
+                }
+                .tint(Color("AppTeal"))
+
+                Rectangle()
+                    .fill(Color("AppInk").opacity(0.1))
+                    .frame(height: 0.5)
+
+                HStack {
+                    Text("最終同期")
+                        .font(.caption)
+                        .foregroundStyle(Color("AppInk").opacity(0.55))
+                    Spacer()
+                    Text(lastSyncText)
+                        .font(.caption)
+                        .foregroundStyle(Color("AppInk").opacity(0.55))
+                }
+
+                Text("変更は次回起動時に反映されます。")
+                    .font(.caption2)
+                    .foregroundStyle(Color("AppInk").opacity(0.4))
+            }
+            .padding(16)
+        }
+    }
+
+    private var lastSyncText: String {
+        guard iCloudSyncEnabled, let date = lastSyncDate else {
+            return iCloudSyncEnabled ? "同期待ち" : "オフ"
+        }
+        let mins = Int(Date().timeIntervalSince(date) / 60)
+        if mins < 1 { return "たった今" }
+        if mins < 60 { return "\(mins)分前" }
+        let hours = mins / 60
+        return "\(hours)時間前"
     }
 
     // MARK: Section 1: Export

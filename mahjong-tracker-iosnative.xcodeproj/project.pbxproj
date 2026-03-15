@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A3C65FB52F65A98500189C65 /* MahjongWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A3C65F112F65A98500189C65 /* MahjongWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A3BBF5B42F65A98500189C62 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,12 +25,20 @@
 			remoteGlobalIDString = A3AAF5B02F65A98500189C61;
 			remoteInfo = "mahjong-tracker-iosnative";
 		};
+		A3C65FB42F65A98500189C65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A3AAF5A92F65A98500189C61 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A3C65FAF2F65A98500189C65;
+			remoteInfo = MahjongWidget;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A3AAF5B12F65A98500189C61 /* mahjong-tracker-iosnative.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mahjong-tracker-iosnative.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3BBF5112F65A98500189C62 /* mahjong-tracker-iosnativeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mahjong-tracker-iosnativeTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3BBF5112F65A98500189C63 /* mahjong-tracker-iosnativeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mahjong-tracker-iosnativeUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3C65F112F65A98500189C65 /* MahjongWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MahjongWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -58,7 +70,26 @@
 			path = "mahjong-tracker-iosnativeUITests";
 			sourceTree = "<group>";
 		};
+		A3C65F322F65A98500189C65 /* MahjongWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MahjongWidget;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A3C65FC02F65A98500189C65 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A3C65FB52F65A98500189C65 /* MahjongWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A3AAF5AE2F65A98500189C61 /* Frameworks */ = {
@@ -82,6 +113,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A3C65FAD2F65A98500189C65 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -91,6 +129,7 @@
 				A3AAF5B32F65A98500189C61 /* mahjong-tracker-iosnative */,
 				A3BBF5322F65A98500189C62 /* mahjong-tracker-iosnativeTests */,
 				A3BBF5322F65A98500189C63 /* mahjong-tracker-iosnativeUITests */,
+				A3C65F322F65A98500189C65 /* MahjongWidget */,
 				A3AAF5B22F65A98500189C61 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -101,6 +140,7 @@
 				A3AAF5B12F65A98500189C61 /* mahjong-tracker-iosnative.app */,
 				A3BBF5112F65A98500189C62 /* mahjong-tracker-iosnativeTests.xctest */,
 				A3BBF5112F65A98500189C63 /* mahjong-tracker-iosnativeUITests.xctest */,
+				A3C65F112F65A98500189C65 /* MahjongWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -115,10 +155,12 @@
 				A3AAF5AD2F65A98500189C61 /* Sources */,
 				A3AAF5AE2F65A98500189C61 /* Frameworks */,
 				A3AAF5AF2F65A98500189C61 /* Resources */,
+				A3C65FC02F65A98500189C65 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A3C65FB32F65A98500189C65 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A3AAF5B32F65A98500189C61 /* mahjong-tracker-iosnative */,
@@ -129,6 +171,26 @@
 			productName = "mahjong-tracker-iosnative";
 			productReference = A3AAF5B12F65A98500189C61 /* mahjong-tracker-iosnative.app */;
 			productType = "com.apple.product-type.application";
+		};
+		A3C65FAF2F65A98500189C65 /* MahjongWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A3C65FB22F65A98500189C65 /* Build configuration list for PBXNativeTarget "MahjongWidget" */;
+			buildPhases = (
+				A3C65FAC2F65A98500189C65 /* Sources */,
+				A3C65FAD2F65A98500189C65 /* Frameworks */,
+				A3C65FAE2F65A98500189C65 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A3C65F322F65A98500189C65 /* MahjongWidget */,
+			);
+			name = MahjongWidget;
+			productName = MahjongWidget;
+			productReference = A3C65F112F65A98500189C65 /* MahjongWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		A3BBF5AF2F65A98500189C62 /* mahjong-tracker-iosnativeTests */ = {
 			isa = PBXNativeTarget;
@@ -193,6 +255,9 @@
 						CreatedOnToolsVersion = 26.3;
 						TestTargetID = A3AAF5B02F65A98500189C61;
 					};
+					A3C65FAF2F65A98500189C65 = {
+						CreatedOnToolsVersion = 26.3;
+					};
 				};
 			};
 			buildConfigurationList = A3AAF5AC2F65A98500189C61 /* Build configuration list for PBXProject "mahjong-tracker-iosnative" */;
@@ -212,6 +277,7 @@
 				A3AAF5B02F65A98500189C61 /* mahjong-tracker-iosnative */,
 				A3BBF5AF2F65A98500189C62 /* mahjong-tracker-iosnativeTests */,
 				A3BBF5AF2F65A98500189C63 /* mahjong-tracker-iosnativeUITests */,
+				A3C65FAF2F65A98500189C65 /* MahjongWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -232,6 +298,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A3BBF5AE2F65A98500189C63 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A3C65FAE2F65A98500189C65 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -262,6 +335,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A3C65FAC2F65A98500189C65 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -274,6 +354,11 @@
 			isa = PBXTargetDependency;
 			target = A3AAF5B02F65A98500189C61 /* mahjong-tracker-iosnative */;
 			targetProxy = A3BBF5B42F65A98500189C63 /* PBXContainerItemProxy */;
+		};
+		A3C65FB32F65A98500189C65 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A3C65FAF2F65A98500189C65 /* MahjongWidget */;
+			targetProxy = A3C65FB42F65A98500189C65 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -549,6 +634,49 @@
 			};
 			name = Release;
 		};
+		A3C65FB02F65A98500189C65 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "MahjongWidget/MahjongWidget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B7SA35WR4B;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = "com.apple.widgetkit-extension";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ryota.mahjongtracker.widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A3C65FB12F65A98500189C65 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "MahjongWidget/MahjongWidget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B7SA35WR4B;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = "com.apple.widgetkit-extension";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ryota.mahjongtracker.widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -584,6 +712,15 @@
 			buildConfigurations = (
 				A3BBF5B02F65A98500189C63 /* Debug */,
 				A3BBF5B12F65A98500189C63 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A3C65FB22F65A98500189C65 /* Build configuration list for PBXNativeTarget "MahjongWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A3C65FB02F65A98500189C65 /* Debug */,
+				A3C65FB12F65A98500189C65 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

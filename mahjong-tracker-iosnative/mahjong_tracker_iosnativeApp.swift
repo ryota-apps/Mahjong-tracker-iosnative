@@ -10,19 +10,33 @@ import SwiftData
 
 @main
 struct mahjong_tracker_iosnativeApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Session.self,
-            Shop.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    var sharedModelContainer: ModelContainer
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+    init() {
+        let schema = Schema([Session.self, Shop.self])
+
+        if CommandLine.arguments.contains("UI_TESTING") {
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            sharedModelContainer = try! ModelContainer(for: schema, configurations: [config])
+            return
         }
-    }()
+
+        let groupID = "group.com.ryota.mahjongtracker"
+        let storeURL: URL
+        if let groupURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupID) {
+            storeURL = groupURL.appendingPathComponent("mahjong.sqlite")
+        } else {
+            storeURL = URL.applicationSupportDirectory.appendingPathComponent("mahjong.sqlite")
+        }
+
+        let iCloudEnabled = UserDefaults.standard.object(forKey: "iCloudSyncEnabled") as? Bool ?? true
+        let config = ModelConfiguration(
+            schema: schema,
+            url: storeURL,
+            cloudKitDatabase: iCloudEnabled ? .automatic : .none
+        )
+        sharedModelContainer = try! ModelContainer(for: schema, configurations: [config])
+    }
 
     var body: some Scene {
         WindowGroup {
